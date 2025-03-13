@@ -1,11 +1,22 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const MyForm = () => {
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    age: "",
+    gender: "",
+    contact: "",
+    email: "",
+    photo: null, 
+    id_card: null,
+  });
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setFormData({ ...formData, photo: file }); 
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoPreview(reader.result);
@@ -14,9 +25,46 @@ const MyForm = () => {
     }
   };
 
+  // Handle input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Handle file input
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, id_card: e.target.files[0] }); 
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("age", formData.age);
+    data.append("gender", formData.gender);
+    data.append("contact", formData.contact); 
+    data.append("email", formData.email);
+    data.append("photo", formData.photo); 
+    data.append("id_card", formData.id_card); 
+
+    try {
+      const res = await axios.post("http://localhost:8080/api/create", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log("User Created:", res.data);
+    } catch (err) {
+      console.error("Error submitting form:", err);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-      <form className="w-full max-w-lg bg-white rounded-lg shadow-md p-6 space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-lg bg-white rounded-lg shadow-md p-6 space-y-4"
+      >
         <div className="space-y-4">
           {/* User Photo Upload with Preview */}
           <div className="w-full flex flex-col items-center">
@@ -77,43 +125,60 @@ const MyForm = () => {
           </div>
 
           {/* Name Input */}
-          <input 
-            type="text" 
-            placeholder='Passenger Name...' 
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Passenger Name..."
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           {/* Age Input */}
-          <input 
-            type="number" 
-            placeholder='Passenger Age' 
+          <input
+            type="number"
+            name="age"
+            value={formData.age}
+            onChange={handleChange}
+            placeholder="Passenger Age"
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           {/* Gender Select */}
-          <select 
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Choose Gender</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
-            <option value="Other">Other</option>
+            <option value="other">Other</option>
           </select>
 
           {/* Phone Input */}
-          <input 
-            type="number" 
-            placeholder='Passenger Phone Number...' 
+          <input
+            type="number"
+            name="contact" 
+            value={formData.contact}
+            onChange={handleChange}
+            placeholder="Passenger Phone Number..."
+            required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           {/* Email Input */}
-          <input 
-            type="email" 
-            placeholder='Passenger Email...' 
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Passenger Email..."
+            required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
@@ -122,22 +187,20 @@ const MyForm = () => {
             <label className="block text-gray-700 text-sm font-bold mb-2">
               ID Card
             </label>
-            <input 
-              type="file" 
-              className="block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-md file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                hover:file:bg-blue-100"
+            <input
+              type="file"
+              name="idCard"
+              onChange={handleFileChange}
+              required
+              className="block w-full text-sm text-gray-500"
             />
           </div>
         </div>
 
         {/* Submit Button */}
-        <button 
-          type='submit'
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 font-medium"
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md"
         >
           Submit
         </button>
