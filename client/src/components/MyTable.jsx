@@ -4,6 +4,7 @@ import { GrDocumentUpdate } from "react-icons/gr";
 import { IoMdClose } from "react-icons/io";
 import axios from "axios";
 import Loading from "./Loading";
+import toast, { Toaster } from 'react-hot-toast';
 
 const MyTable = () => {
   const [data, setData] = useState([]);
@@ -23,7 +24,7 @@ const MyTable = () => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/users");
+      const res = await axios.get("https://passengersmanagementsystem-1.onrender.com/api/users");
       setData(res.data.users);
       setLoading(false);
     } catch (err) {
@@ -69,7 +70,7 @@ const MyTable = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/update/${selectedUser._id}`,
+        `https://passengersmanagementsystem-1.onrender.com/api/update/${selectedUser._id}`,
         formData,
         {
           headers: {
@@ -107,7 +108,7 @@ const MyTable = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
-        const response = await axios.delete(`http://localhost:8080/api/delete/${id}`);
+        const response = await axios.delete(`https://passengersmanagementsystem-1.onrender.com/api/delete/${id}`);
         if (response.status === 200) {
           alert("User deleted successfully!");
           fetchData();

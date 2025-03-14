@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import toast, { Toaster } from 'react-hot-toast';
 
 const MyForm = () => {
   const [photoPreview, setPhotoPreview] = useState(null);
@@ -9,14 +10,14 @@ const MyForm = () => {
     gender: "",
     contact: "",
     email: "",
-    photo: null, 
+    photo: null,
     id_card: null,
   });
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData({ ...formData, photo: file }); 
+      setFormData({ ...formData, photo: file });
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoPreview(reader.result);
@@ -25,18 +26,15 @@ const MyForm = () => {
     }
   };
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle file input
   const handleFileChange = (e) => {
-    setFormData({ ...formData, id_card: e.target.files[0] }); 
+    setFormData({ ...formData, id_card: e.target.files[0] });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -44,23 +42,39 @@ const MyForm = () => {
     data.append("name", formData.name);
     data.append("age", formData.age);
     data.append("gender", formData.gender);
-    data.append("contact", formData.contact); 
+    data.append("contact", formData.contact);
     data.append("email", formData.email);
-    data.append("photo", formData.photo); 
-    data.append("id_card", formData.id_card); 
+    data.append("photo", formData.photo);
+    data.append("id_card", formData.id_card);
 
     try {
-      const res = await axios.post("http://localhost:8080/api/create", data, {
+      const res = await axios.post("https://passengersmanagementsystem-1.onrender.com/api/create", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      toast.success("User created successfully!");
       console.log("User Created:", res.data);
+
+      // Reset form after successful submission
+      setFormData({
+        name: "",
+        age: "",
+        gender: "",
+        contact: "",
+        email: "",
+        photo: null,
+        id_card: null,
+      });
+      setPhotoPreview(null);
     } catch (err) {
+      toast.error("Error submitting form. Please try again.");
       console.error("Error submitting form:", err);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+      <Toaster /> {/* Toast notifications */}
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-lg bg-white rounded-lg shadow-md p-6 space-y-4"
@@ -163,7 +177,7 @@ const MyForm = () => {
           {/* Phone Input */}
           <input
             type="number"
-            name="contact" 
+            name="contact"
             value={formData.contact}
             onChange={handleChange}
             placeholder="Passenger Phone Number..."
