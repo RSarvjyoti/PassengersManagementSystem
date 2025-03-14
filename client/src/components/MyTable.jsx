@@ -4,7 +4,6 @@ import { GrDocumentUpdate } from "react-icons/gr";
 import { IoMdClose } from "react-icons/io";
 import axios from "axios";
 import Loading from "./Loading";
-import toast, { Toaster } from 'react-hot-toast';
 
 const MyTable = () => {
   const [data, setData] = useState([]);
